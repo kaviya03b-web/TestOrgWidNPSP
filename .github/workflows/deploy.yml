@@ -1,0 +1,32 @@
+name: Salesforce Auto Deploy
+
+on:
+  push:
+    branches:
+      - dev  # Trigger on main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1️⃣ Checkout repo
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # 2️⃣ Install Salesforce CLI
+      - name: Install Salesforce CLI
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sf-cli-linux-amd64.tar.xz
+          tar xf sf-cli-linux-amd64.tar.xz
+          ./sf/install
+
+      # 3️⃣ Authenticate to Target Org
+      - name: Authenticate to Target Org
+        run: |
+          echo $SF_AUTH_URL > sfdx_auth_url.txt
+          sf auth:sfdx-url store -f sfdx_auth_url.txt --alias TargetOrg
+
+      # 4️⃣ Deploy Metadata
+      - name: Deploy to Target Org
+        run: sf deploy metadata -x manifest/package.xml --target-org TargetOrg --wait 10
