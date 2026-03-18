@@ -1,9 +1,9 @@
-name: Salesforce Auto Deploy
+name: Deploy Single LWC
 
 on:
   push:
     branches:
-      - dev  # Trigger on main branch
+      - dev  # or main branch that triggers automation
 
 jobs:
   deploy:
@@ -27,6 +27,7 @@ jobs:
           echo $SF_AUTH_URL > sfdx_auth_url.txt
           sf auth:sfdx-url store -f sfdx_auth_url.txt --alias TargetOrg
 
-      # 4️⃣ Deploy Metadata
-      - name: Deploy to Target Org
-        run: sf deploy metadata -x manifest/package.xml --target-org TargetOrg --wait 10
+      # 4️⃣ Deploy the LWC only
+      - name: Deploy LWC Component
+        run: |
+          sf deploy metadata -m "LightningComponentBundle:newLWC1" --target-org TargetOrg --wait 10
