@@ -1,0 +1,21 @@
+name: Deploy to Salesforce
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Salesforce CLI
+        run: |
+          wget https://developer.salesforce.com/media/salesforce-cli/sfdx-linux-amd64.tar.xz
+          tar xf sfdx-linux-amd64.tar.xz
+          ./sfdx/install
+      - name: Authenticate to Salesforce
+        run: sfdx auth:sfdxurl:store -f ./sfdx_auth_url.txt -a TargetOrg
+      - name: Deploy to Target Org
+        run: sfdx force:source:deploy -x manifest/package.xml -u TargetOrg -w -1
